@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.example.demo.models.entity.Cliente;
 
+
+//service
 public interface IClienteService {
 	public List<Cliente>  findAll();
 	public void save(Cliente cliente);
