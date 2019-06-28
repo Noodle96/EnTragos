@@ -10,6 +10,8 @@ import com.example.demo.models.dao.IClienteDao;
 import com.example.demo.models.entity.Cliente;
 
 
+//this is a comment
+
 //una clase service esta basado en el patron de diseño facade => 
 //un unico punto de acceso hacia distintos daos o repositorios
 //dentro de una clase service podemos manejar distintos atrinutos => para no acceder directamente a las clases dao
