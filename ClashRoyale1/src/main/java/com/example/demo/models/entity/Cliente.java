@@ -19,6 +19,8 @@ import javax.validation.constraints.NotEmpty;
 
 //import org.springframework.format.annotation.DateTimeFormat;
 
+//comment cliente
+
 @Entity
 @Table(name="clientes")
 public class Cliente implements Serializable{
