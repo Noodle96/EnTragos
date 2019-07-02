@@ -125,6 +125,13 @@ public class Cliente implements Serializable{
 	public void setFoto(String foto) {
 		this.foto = foto;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Cliente [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", email=" + email
+				+ ", createAt=" + createAt + ", foto=" + foto + "]";
+	}
 	
 
 }
