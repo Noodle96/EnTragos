@@ -16,6 +16,7 @@ public class ClashRoyale1Application implements CommandLineRunner {
 		SpringApplication.run(ClashRoyale1Application.class, args);
 	}
 
+	//this is a commenter
 	@Override
 	public void run(String... args) throws Exception {
 		uploadFileService.deleteAll();
