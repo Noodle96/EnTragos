@@ -1,7 +1,9 @@
 package com.example.demo.models.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,7 +12,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -36,6 +40,16 @@ public class Factura implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Cliente cliente;
 	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name="factura_id")
+	private List<ItemFactura> items;
+	
+	
+	
+	public Factura() {
+		items = new ArrayList<ItemFactura>();
+	}
+
 	@PrePersist
 	void prePersist() {
 		creatAt = new Date();
@@ -81,6 +95,22 @@ public class Factura implements Serializable {
 		this.cliente = cliente;
 	}
 	
+	
+	
+	public List<ItemFactura> getItems() {
+		return items;
+	}
+
+	public void setItems(List<ItemFactura> items) {
+		this.items = items;
+	}
+	
+	public void addItemFactura(ItemFactura itemfactura) {
+		items.add(itemfactura);
+	}
+
+
+
 	private static final long serialVersionUID = 1L;
 
 }
