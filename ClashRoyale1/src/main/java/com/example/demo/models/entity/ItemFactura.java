@@ -2,10 +2,14 @@ package com.example.demo.models.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
@@ -19,6 +23,10 @@ public class ItemFactura implements Serializable {
 
 	private Integer cantidad;
 
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name ="producto_id")
+	private Producto producto;
+	
 	public long getId() {
 		return id;
 	}
@@ -35,8 +43,8 @@ public class ItemFactura implements Serializable {
 		this.cantidad = cantidad;
 	}
 	
-	public Long calcularImporte() {
-		return cantidad.longValue();
+	public Double calcularImporte() {
+		return cantidad.doubleValue()*producto.getPrecio();
 	}
 
 	private static final long serialVersionUID = 1L;

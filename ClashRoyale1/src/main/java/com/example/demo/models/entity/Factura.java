@@ -33,7 +33,7 @@ public class Factura implements Serializable {
 	private String observacion;
 	
 	@Temporal(TemporalType.DATE)
-	@Column(name="created_at")
+	@Column(name="create_at")
 	private Date creatAt;
 	
 	
@@ -109,6 +109,14 @@ public class Factura implements Serializable {
 		items.add(itemfactura);
 	}
 
+	public Double getTotal() {
+		Double total = 0.0;
+		int size = items.size();
+		for(int e = 0; e < size  ; e++) {
+			total += items.get(e).calcularImporte();
+		}
+		return total;
+	}
 
 
 	private static final long serialVersionUID = 1L;
