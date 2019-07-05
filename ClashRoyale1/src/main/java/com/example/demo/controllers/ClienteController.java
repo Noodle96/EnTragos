@@ -76,7 +76,7 @@ public class ClienteController {
 
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-		Cliente cliente = clienteService.findOne(id);
+		Cliente cliente = clienteService.fetchByIdWithFacturas(id);  //findOne(id);
 		if (cliente == null) {
 			flash.addFlashAttribute("error", "El Cliente no existe en la BBDD");
 			return "redirect:/listar";
@@ -89,7 +89,7 @@ public class ClienteController {
 	
 
 	// mostrar el listado de los clientes
-	@RequestMapping(value = "/listar", method = RequestMethod.GET) // ir a esa vista listar.jsp
+	@RequestMapping(value = {"/listar","/"}, method = RequestMethod.GET) // ir a esa vista listar.jsp
 	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 		Pageable pageRequest = PageRequest.of(page, 5);
 		Page<Cliente> clientes = clienteService.findAll(pageRequest);

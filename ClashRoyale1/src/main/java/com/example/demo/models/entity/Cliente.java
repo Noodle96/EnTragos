@@ -145,6 +145,9 @@ public class Cliente implements Serializable{
 				+ ", createAt=" + createAt + ", foto=" + foto + "]";
 	}
 
+	public String  getData() {
+		return nombre + " " + apellido;
+	}
 
 	public List<Factura> getFacturas() {
 		return facturas;

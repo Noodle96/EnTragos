@@ -19,6 +19,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name="facturas")
@@ -28,6 +29,7 @@ public class Factura implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty
 	private String descripcion;
 	
 	private String observacion;
@@ -37,7 +39,7 @@ public class Factura implements Serializable {
 	private Date createAt;
 	
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Cliente cliente;
 	
 	
@@ -52,7 +54,7 @@ public class Factura implements Serializable {
 	}
 
 	@PrePersist
-	void prePersist() {
+	public void prePersist() {
 		createAt = new Date();
 	}
 
@@ -118,6 +120,15 @@ public class Factura implements Serializable {
 		}
 		return total;
 	}
+
+	
+
+	@Override
+	public String toString() {
+		return "Factura [id=" + id + ", descripcion=" + descripcion + ", observacion=" + observacion + ", createAt="
+				+ createAt + ", cliente=" + cliente + ", items=" + items + "]";
+	}
+
 
 
 	private static final long serialVersionUID = 1L;

@@ -3,12 +3,12 @@
 <body>
 <script type="text/javascript" th:fragment="javascript">
 $(document).ready(function() {
-
-	$("#buscar_producto").autocomplete({
+	// del formiulario form buscar_producto
+	$("#buscar_producto").autocomplete({ // in factura/form.html
 
 		source : function(request, response) {
 			$.ajax({
-				url : "/factura/cargar-productos/" + request.term,
+				url : "/factura/cargar-productos/" + request.term, // in FacturaController 
 				dataType : "json",
 				data : {
 					term : request.term
@@ -30,31 +30,38 @@ $(document).ready(function() {
 				itemsHelper.incrementaCantidad(ui.item.value, ui.item.precio);
 				return false;
 			}
-			var linea = $("#plantillaItemsFactura").html();
+			var linea = $("#plantillaItemsFactura").html(); // va a contener a su hijo tr (plantilla-items.html) // in plantilla-items.html
 					
 			linea = linea.replace(/{ID}/g, ui.item.value);
 			linea = linea.replace(/{NOMBRE}/g, ui.item.label);
 			linea = linea.replace(/{PRECIO}/g, ui.item.precio);
 			
-			$("#cargarItemProductos tbody").append(linea);
+			$("#cargarItemProductos tbody").append(linea); // in factura/form.html
 			itemsHelper.calcularImporte(ui.item.value, ui.item.precio, 1);
 
 			return false;
 		}
 	});
+	
+	
+	$("form").submit(function(){
+		$("#plantillaItemsFactura").remove();
+		return;
+	});
+
 
 });
 
 var itemsHelper = {
 		calcularImporte: function(id, precio, cantidad){
-			$("#total_importe_" + id).html(parseInt(precio) * parseInt(cantidad));
+			$("#total_importe_" + id).html(parseInt(precio) * parseInt(cantidad)); //in plantilla-items.html
 			this.calcularGranTotal();
 		},
 		hasProducto: function(id){
 			
 			var resultado = false;
 			
-			$('input[name="item_id[]"]').each(function(){
+			$('input[name="item_id[]"]').each(function(){ // in plantilla-items.html
 				if(parseInt(id) == parseInt($(this).val()) ){
 					resultado = true;
 				}
@@ -63,7 +70,7 @@ var itemsHelper = {
 			return resultado;
 		},
 		incrementaCantidad: function(id, precio){
-			var cantidad = $("#cantidad_" + id).val() ? parseInt($("#cantidad_" + id).val()) : 0;
+			var cantidad = $("#cantidad_" + id).val() ? parseInt($("#cantidad_" + id).val()) : 0; //in plantilla-items.html
 			$("#cantidad_" + id).val(++cantidad);
 			this.calcularImporte(id, precio, cantidad);
 		},
