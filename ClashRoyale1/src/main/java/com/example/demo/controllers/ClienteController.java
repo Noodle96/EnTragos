@@ -3,11 +3,10 @@ package com.example.demo.controllers;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-
+import java.util.Collection;
 import java.util.Map;
 
-
-
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -20,6 +19,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -53,7 +59,7 @@ public class ClienteController {
 	
 	
 	
-	
+	@Secured("ROLE_USER")
 	@GetMapping(value = "/uploads/{filename:.+}")
 	public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
 
@@ -73,7 +79,7 @@ public class ClienteController {
 	
 	
 	
-
+	@Secured("ROLE_USER")
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 		Cliente cliente = clienteService.fetchByIdWithFacturas(id);  //findOne(id);
@@ -90,7 +96,39 @@ public class ClienteController {
 
 	// mostrar el listado de los clientes
 	@RequestMapping(value = {"/listar","/"}, method = RequestMethod.GET) // ir a esa vista listar.jsp
-	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
+			Authentication authentication, 
+			HttpServletRequest request) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if(auth != null) {
+			log.info("Bienvenido Usuario con SecurityContextHolder.getContext().getAuthentication(); : ".concat(auth.getName()));
+		}
+		
+		//De la forma programatica
+		if(hasRole("ROLE_ADMIN")) {
+			log.info("hola Usuario ".concat(auth.getName()).concat(" tienes acceso"));
+		}else {
+			log.info("hola Usuario ".concat(auth.getName()).concat(" No tienes acceso"));
+		}
+		
+		//De la forma con SecurityContextHolderAwareRequestWrapper
+		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+		if(securityContext.isUserInRole("ADMIN")) {
+			log.info("hola Usuario forma SecurityContextHolderAwareRequestWrapper ".concat(auth.getName()).concat(" tienes acceso"));
+		}
+		else {
+			log.info("hola Usuario forma SecurityContextHolderAwareRequestWrapper ".concat(auth.getName()).concat(" No tienes acceso"));
+		}
+		
+		//De la forma con request
+		if(request.isUserInRole("ROLE_ADMIN")) {
+			log.info("hola Usuario forma HttpServletRequest ".concat(auth.getName()).concat(" tienes acceso"));
+		}
+		else {
+			log.info("hola Usuario forma HttpServletRequest ".concat(auth.getName()).concat(" No tienes acceso"));
+		}
+		
+		
 		Pageable pageRequest = PageRequest.of(page, 5);
 		Page<Cliente> clientes = clienteService.findAll(pageRequest);
 		PageRender<Cliente> pageRender = new PageRender<Cliente>("/listar", clientes);
@@ -104,6 +142,7 @@ public class ClienteController {
 	
 	
 	// manda el objecto cliente al form.jsp
+	@Secured("ROLE_ADMIN")
 	@RequestMapping(value = "/form", method = RequestMethod.GET) // get
 	public String crear(Map<String, Object> model) {
 		Cliente cliente = new Cliente();
@@ -117,6 +156,7 @@ public class ClienteController {
 	// guardar a un cliente a la base de datos
 	// @valid habilita la validacion en el objeto mapeado al form
 	// SessionStatus status
+	@Secured("ROLE_ADMIN")
 	@RequestMapping(value = "/form", method = RequestMethod.POST) // post
 	public String guardar(@Valid Cliente cliente, BindingResult result, Model mode,
 			@RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
@@ -170,7 +210,7 @@ public class ClienteController {
 	
 	
 	
-	
+	@Secured("ROLE_ADMIN")
 	@RequestMapping(value = "/form/{id}")
 	public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 		Cliente cliente = null;
@@ -190,7 +230,7 @@ public class ClienteController {
 		return "form";
 	}
 
-	
+	@Secured("ROLE_ADMIN")
 	@RequestMapping(value = "/eliminar/{id}")
 	public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
 		if (id > 0) {
@@ -198,12 +238,38 @@ public class ClienteController {
 			clienteService.delete(id);
 			flash.addFlashAttribute("success", "Cliente eliminado con éxito!");
 
-			if (uploadFileService.delete(cliente.getFoto())) {
-				flash.addFlashAttribute("info", "foto " + cliente.getFoto() + " delete succesfully");
+			if(cliente.getFoto() != null && cliente.getFoto().length() > 0) {
+				if (uploadFileService.delete(cliente.getFoto())) {
+					flash.addFlashAttribute("info", "foto " + cliente.getFoto() + " delete succesfully");
+				}
 			}
+			
 
 		}
 		return "redirect:/listar";
 	}
+	
+	private boolean hasRole(String role) {
+		SecurityContext context = SecurityContextHolder.getContext();
+		if(context ==null) {
+			return false;
+		}
+		Authentication auth = context.getAuthentication();
+		if(auth==null) {
+			return false;
+		}
+		Collection<? extends GrantedAuthority> autorities = auth.getAuthorities();
+		return autorities.contains(new SimpleGrantedAuthority(role));
+		/*
+		for(GrantedAuthority autority: autorities  ) {
+			if(role.equals(autority.getAuthority())) {
+				log.info("hola Usuario ".concat(auth.getName()).concat(" tu role es: ").concat(autority.getAuthority()));
+				return true;
+			}
+		}
+		return false;
+		*/
+	}
+	
 
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="layout/layout :: head"></head>
 <body>
 	<header th:replace="layout/layout :: header"></header>
@@ -8,7 +9,7 @@
 			<div class="card-header" th:text="${titulo}"></div>
 			<div class="card-body">
 			<h4 class="card-title">
-					<a class="btn btn-primary btn-xs"
+					<a  sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-primary btn-xs"
 						th:href="@{'/factura/form/' + ${cliente.id}}"
 						th:text="'Crear Factura'"></a>
 			</h4>

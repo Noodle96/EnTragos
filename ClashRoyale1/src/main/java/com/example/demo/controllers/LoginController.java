@@ -11,7 +11,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class LoginController {
 	@GetMapping("/login")
-	public String login(@RequestParam(value="error", required=false) String error,  Model model, Principal principal,
+	public String login(@RequestParam(value="error", required=false) String error,
+			@RequestParam(value="logout", required=false) String logout,
+			Model model, Principal principal,
 			RedirectAttributes flash) {
 		//para evitar que haga doble inicio de sesion
 		if(principal !=  null) {
@@ -21,6 +23,9 @@ public class LoginController {
 		if(error != null) {
 			model.addAttribute("error", "Error al login: Nombre o password Incorrect, Try Again!!");
 			
+		}
+		if(logout != null) {
+			model.addAttribute("success", "Ha cerrado sesión con éxito !!");
 		}
 		return "login";
 	}
